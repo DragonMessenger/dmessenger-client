@@ -5,6 +5,8 @@ from colorama import init, Fore
 from colorama import Back
 from colorama import Style
 
+recieveBytes = 2048
+
 # Init methods
 init(autoreset=True)
 
@@ -35,7 +37,7 @@ class Client:
 
                 break
             except:
-                print('[Error] The connection is lost. Reconnecting...')
+                print(Fore.RED + '[Error] The connection is lost. Reconnecting...')
 
         chunk_size = 1024 # 512
         audio_format = pyaudio.paInt16
@@ -47,7 +49,7 @@ class Client:
         self.playing_stream = self.p.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=chunk_size)
         self.recording_stream = self.p.open(format=audio_format, channels=channels, rate=rate, input=True, frames_per_buffer=chunk_size)
         
-        print("Connected to Server")
+        print(Fore.CYAN + "Connected to Server")
 
         # start threads
         receive_thread = threading.Thread(target=self.receive_server_data).start()
@@ -56,7 +58,7 @@ class Client:
     def receive_server_data(self):
         while True:
             try:
-                data = self.s.recv(1024)
+                data = self.s.recv(recieveBytes)
                 self.playing_stream.write(data)
             except:
                 pass
@@ -65,7 +67,7 @@ class Client:
     def send_data_to_server(self):
         while True:
             try:
-                data = self.recording_stream.read(1024)
+                data = self.recording_stream.read(recieveBytes)
                 self.s.sendall(data)
             except:
                 pass
